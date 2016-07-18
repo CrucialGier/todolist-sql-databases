@@ -10,7 +10,7 @@ namespace ToDoList.Objects
   {
     public CategoryTest()
     {
-      DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=todolist_test;Integrated Security=SSPI;";
+      DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=todo_test;Integrated Security=SSPI;";
     }
 
     [Fact]
@@ -67,6 +67,46 @@ namespace ToDoList.Objects
     }
 
     [Fact]
+    public void Test_AddTask_AddsTaskToCategory()
+    {
+      Category testCategory = new Category("Household chores");
+      testCategory.Save();
+
+      Task testTask = new Task("Mow the Lawn", new DateTime(2014, 4, 21));
+      testTask.Save();
+
+      Task testTask2 = new Task("Water the garden", new DateTime(2014, 4, 21));
+      testTask2.Save();
+
+      testCategory.AddTask(testTask);
+      testCategory.AddTask(testTask2);
+
+      List<Task> result = testCategory.GetTasks();
+      List<Task> testList = new List<Task>{testTask, testTask2};
+
+      Assert.Equal(testList, result);
+    }
+
+    [Fact]
+    public void Test_GetTasks_RetrievesAllCategoryTasks()
+    {
+      Category testCategory = new Category("Household chores");
+      testCategory.Save();
+
+      Task testTask1 = new Task("Mow the lawn", new DateTime(2014, 4, 21));
+      testTask1.Save();
+
+      Task testTask2 = new Task("Buy plane ticket", new DateTime(2014, 4, 21));
+      testTask2.Save();
+
+      testCategory.AddTask(testTask1);
+      List<Task> savedTasks = testCategory.GetTasks();
+      List<Task> testList = new List<Task> {testTask1};
+
+      Assert.Equal(testList, savedTasks);
+    }
+
+    [Fact]
     public void Test_Find_FindsCategoryInDatabase()
     {
       //Arrange
@@ -78,24 +118,6 @@ namespace ToDoList.Objects
 
       //Assert
       Assert.Equal(testCategory, foundCategory);
-    }
-
-    [Fact]
-    public void Test_GetTasks_RetrievesAllTasksWithCategory()
-    {
-      Category testCategory = new Category("Household chores");
-      testCategory.Save();
-
-      Task firstTask = new Task("Mow the lawn", testCategory.GetId(), new DateTime(2015, 1, 18));
-      firstTask.Save();
-      Task secondTask = new Task("Do the dishes", testCategory.GetId(), new DateTime(2015, 1, 18));
-      secondTask.Save();
-
-
-      List<Task> testTaskList = new List<Task> {firstTask, secondTask};
-      List<Task> resultTaskList = testCategory.GetTasks();
-
-      Assert.Equal(testTaskList, resultTaskList);
     }
 
     public void Dispose()
